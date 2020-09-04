@@ -4,11 +4,13 @@ document.addEventListener('DOMContentLoaded',function(){
 
 var weather=[];// Global array to store weather details(temperature and date)
 var tab=document.getElementById("resultsTable");
+var result=document.getElementById("printResults");
 
 
 function getWeather(event) {// Function to get weather data from input fields
     event.preventDefault();
     tab.style.visibility="hidden";
+    result.style.visibility="hidden";
     var temp = document.getElementById('temperature').value;
     var date=document.getElementById('date').value;
     var tempValidator=document.getElementById('temperatureValidator');
@@ -21,7 +23,7 @@ function getWeather(event) {// Function to get weather data from input fields
         dateValidator.style.display='inline';
     }
     else if(temp!=""&&date!=""){
-            temp=parseInt(temp);//Convert the temperature to a number
+        temp=parseInt(temp);//Convert the temperature to a number
         console.log('Temperature to be added: '+temp);
         console.log('Date to be added: '+date);
         addWeather(temp,date);
@@ -32,8 +34,8 @@ function getWeather(event) {// Function to get weather data from input fields
     }    
 
 function addWeather(temperature,date){// Function to enter the weather data into our array
-        weather.push({temperature: temperature, date: date});
-        console.log('Weather array contains: ');
+    weather.push({temperature: temperature, date: date});
+    console.log('Weather array contains: ');
     for(var i=0;i<weather.length;i++){
         console.log(weather[i]);
     }
@@ -80,6 +82,7 @@ function bubbleSortbyDate(){
 function genRandomWeather(event){// Function to generate seed data
     event.preventDefault();
     tab.style.visibility="hidden";
+    result.style.visibility="hidden";
     weather=[];
     var randomDate;
     var randomTemp;
@@ -113,14 +116,15 @@ function displayResults(){// Function to dyanamicaly create rows of the table an
             var row=tab.insertRow(i+1);
             var cell1=row.insertCell(0);
             var cell2=row.insertCell(1);
-           cell1.innerHTML=weather[i].temperature;
-           cell2.innerHTML=weather[i].date;
+            cell1.innerHTML=weather[i].temperature;
+            cell2.innerHTML=weather[i].date;
     }
     createChart();
 }
 
 function getAverage(event){// Function to get the average temperature
     event.preventDefault();
+    result.style.visibility="visible";
     var length=weather.length;
     var total=0;
     console.log('total is:'+total+'');
@@ -136,6 +140,7 @@ function getAverage(event){// Function to get the average temperature
 
 function getMax(event){// Function to get the maximum temperature
     event.preventDefault();
+    result.style.visibility="visible";
     var weatherCopy=weather;
     weatherCopy=bubbleSortbyTemp(weatherCopy);
     var size=weatherCopy.length;
@@ -147,6 +152,7 @@ function getMax(event){// Function to get the maximum temperature
 
 function getMin(event){// Function to get the minimum temperature
     event.preventDefault();
+    result.style.visibility="visible";
     var weatherCopy=weather;
     weatherCopy=bubbleSortbyTemp(weatherCopy);
     var min=weather[0].temperature;
@@ -174,11 +180,16 @@ function bubbleSortbyTemp(weatherCopy){
 
 function createChart(){
     var myChart=document.getElementById("myChart").getContext("2d");
+    var months =["January", "February", "March", "April", "May", "June","July", "August", "September", "October", "November", "December"];
     var tempArr=weather.map(a=>a.temperature);// Store the temperatures in the new array
+    var dateArr=weather.map(a=>a.date);
+    var getMonths=dateArr.map(a=>a.substring(5,7));
+    getMonths=getMonths.map(a=>parseInt(a));
+    getMonths=getMonths.map(a=>months[a-1]);
     var weatherChart=new Chart(myChart,{
         type: 'line',
         data:{
-            labels:['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+            labels: getMonths,
             datasets:[{
                 label: 'Weather Statistics for year 2020',
                 backgroundColor: 'pink',
@@ -189,16 +200,16 @@ function createChart(){
         options:{}
     });
     myChart.canvas.parentNode.style.height = '50%';
-    myChart.canvas.parentNode.style.width = '500px';
+    myChart.canvas.parentNode.style.width = '50%';
     myChart.canvas.parentNode.style.float = 'right';
 }
 
 
 var addBtn=document.getElementById('add'); // Add button element
 var seedBtn=document.getElementById('seed');// Seed button element
-var avgBtn=document.getElementById('average');
-var maxBtn=document.getElementById('maxTemp');
-var minBtn=document.getElementById('minTemp');
+var avgBtn=document.getElementById('average');// Average button element
+var maxBtn=document.getElementById('maxTemp');// Max button element
+var minBtn=document.getElementById('minTemp');// Min button elements
 
 addBtn.addEventListener('click',getWeather);
 
