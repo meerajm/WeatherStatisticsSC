@@ -55,13 +55,13 @@ function genRandomWeather(event){// Function to generate seed data
     result.style.visibility="hidden";
     weather=[];
     var months=[1,2,3,4,5,6,7,8,9,10,11,12];
-    var mlength=months.length-1;
+    var mlength=months.length;
     var randomDate;
     var randomTemp;
     for(var i=0;i<12;i++){
         randomTemp= Math.floor(Math.random()*51);//Getting a random temperature
         //To get a random month
-        var index=Math.floor(Math.random() * (mlength+1));
+        var index=Math.floor(Math.random() * (mlength));
         m=months[index];
         months.splice(index,1);
         mlength--;  
