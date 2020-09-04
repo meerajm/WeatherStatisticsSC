@@ -29,8 +29,7 @@ function getWeather(event) {// Function to get weather data from input fields
         addWeather(temp,date);
         tempValidator.style.display='none';  
         dateValidator.style.display='none';
-        }
-    
+        }    
     }    
 
 function addWeather(temperature,date){// Function to enter the weather data into our array
@@ -50,45 +49,22 @@ function addWeather(temperature,date){// Function to enter the weather data into
     }
 }
 
-function bubbleSortbyDate(){
-    //Function to sort the data in chronological order
-    var length=weather.length;
-    for(var i=0;i<length;i++){
-        weather[i].date=weather[i].date.replace(/-/g,'');
-        weather[i].date=parseInt(weather[i].date);
-    }
-    for(var i=0;i<length;i++){
-        for(var j=0;j<length-1;j++){
-            if(weather[j].date>weather[j+1].date)
-            //Swap
-            {
-                var hold=weather[j];
-                weather[j]=weather[j+1];
-                weather[j+1]=hold;
-            }
-
-        }
-    }
-        for(var i=0;i<length;i++){
-            weather[i].date=weather[i].date.toString();
-            var y=weather[i].date.substring(0,4);
-            var m=weather[i].date.substring(4,6);
-            var d=weather[i].date.substring(6,8);
-            weather[i].date=y+'-'+m+'-'+d;
-        }
-    
-}
-
 function genRandomWeather(event){// Function to generate seed data
     event.preventDefault();
     tab.style.visibility="hidden";
     result.style.visibility="hidden";
     weather=[];
+    var months=[1,2,3,4,5,6,7,8,9,10,11,12];
+    var mlength=months.length-1;
     var randomDate;
     var randomTemp;
     for(var i=0;i<12;i++){
         randomTemp= Math.floor(Math.random()*51);//Getting a random temperature
-        var m=Math.floor(Math.random()*12)+1;
+        //To get a random month
+        var index=Math.floor(Math.random() * (mlength+1));
+        m=months[index];
+        months.splice(index,1);
+        mlength--;  
         if(m<10){
             m='0'+m+'';
         }
@@ -109,7 +85,20 @@ function displayResults(){// Function to dyanamicaly create rows of the table an
     for(var i=1;i<rowCount;i++){//Deleting all previous rows
         tab.deleteRow(1);
     }
-    bubbleSortbyDate();
+    var length=weather.length;
+    for(var i=0;i<length;i++){
+        weather[i].date=weather[i].date.replace(/-/g,'');
+        weather[i].date=parseInt(weather[i].date);
+    }
+    bubbleSort(weather,"date");
+    for(var i=0;i<length;i++){
+        weather[i].date=weather[i].date.toString();
+        var y=weather[i].date.substring(0,4);
+        var m=weather[i].date.substring(4,6);
+        var d=weather[i].date.substring(6,8);
+        weather[i].date=y+'-'+m+'-'+d;
+    }
+
     console.log(weather);
     //for creating rows and columns and assigning values
     for(var i=0;i<weather.length;i++){    
@@ -135,44 +124,40 @@ function getAverage(event){// Function to get the average temperature
     console.log(length);
     var average=total/length;
     document.getElementById("printResults").innerHTML='The average temperature is '+average+' ';
-    displayResults();
 }
 
 function getMax(event){// Function to get the maximum temperature
     event.preventDefault();
     result.style.visibility="visible";
     var weatherCopy=weather;
-    weatherCopy=bubbleSortbyTemp(weatherCopy);
+    weatherCopy=bubbleSort(weatherCopy);
+    console.log(weatherCopy);
     var size=weatherCopy.length;
     var max=weatherCopy[size-1].temperature;
     document.getElementById("printResults").innerHTML='The maximum temperature is '+max+' ';
-    displayResults();
-
 }
 
 function getMin(event){// Function to get the minimum temperature
     event.preventDefault();
     result.style.visibility="visible";
     var weatherCopy=weather;
-    weatherCopy=bubbleSortbyTemp(weatherCopy);
+    weatherCopy=bubbleSort(weatherCopy);
+    console.log(weatherCopy);
     var min=weather[0].temperature;
     document.getElementById("printResults").innerHTML='The minimum temperature is '+min+' ';
-    displayResults();
-
 }
 
-function bubbleSortbyTemp(weatherCopy){
+function bubbleSort(weatherCopy,sortBy="temperature"){
     //function to sort the data in ascending order of temperature
     var length=weatherCopy.length;
     for(var i=0;i<length;i++){
         for(var j=0;j<length-1;j++){
-            if(weatherCopy[j].temperature>weatherCopy[j+1].temperature){
+            if(weatherCopy[j][sortBy]>weatherCopy[j+1][sortBy]){
             //Swap
                 var hold=weatherCopy[j];
                 weatherCopy[j]=weatherCopy[j+1];
                 weatherCopy[j+1]=hold;
                 }
-
             }            
         }
         return weatherCopy;
@@ -186,7 +171,7 @@ function createChart(){
     var getMonths=dateArr.map(a=>a.substring(5,7));
     getMonths=getMonths.map(a=>parseInt(a));
     getMonths=getMonths.map(a=>months[a-1]);
-    var weatherChart=new Chart(myChart,{
+    new Chart(myChart,{
         type: 'line',
         data:{
             labels: getMonths,
@@ -204,7 +189,6 @@ function createChart(){
     myChart.canvas.parentNode.style.float = 'right';
 }
 
-
 var addBtn=document.getElementById('add'); // Add button element
 var seedBtn=document.getElementById('seed');// Seed button element
 var avgBtn=document.getElementById('average');// Average button element
@@ -212,11 +196,7 @@ var maxBtn=document.getElementById('maxTemp');// Max button element
 var minBtn=document.getElementById('minTemp');// Min button elements
 
 addBtn.addEventListener('click',getWeather);
-
 seedBtn.addEventListener('click',genRandomWeather);
-
 avgBtn.addEventListener('click',getAverage);
-
 maxBtn.addEventListener('click',getMax);
-
 minBtn.addEventListener('click',getMin);
