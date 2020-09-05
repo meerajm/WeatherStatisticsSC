@@ -60,7 +60,7 @@ function genRandomWeather(event){// Function to generate seed data
     var randomTemp;
     for(var i=0;i<12;i++){
         randomTemp= Math.floor(Math.random()*51);//Getting a random temperature
-        //To get a random month
+        //To get a random month without repetition
         var index=Math.floor(Math.random() * (mlength));
         m=months[index];
         months.splice(index,1);
@@ -114,6 +114,11 @@ function displayResults(){// Function to dyanamicaly create rows of the table an
 function getAverage(event){// Function to get the average temperature
     event.preventDefault();
     result.style.visibility="visible";
+    if (weather === undefined || weather.length == 0){
+        console.log(result.style.visibility);
+        result.innerHTML="No data found. Please enter records";
+    }
+    else{
     var length=weather.length;
     var total=0;
     console.log('total is:'+total+'');
@@ -124,27 +129,40 @@ function getAverage(event){// Function to get the average temperature
     console.log(length);
     var average=total/length;
     document.getElementById("printResults").innerHTML='The average temperature is '+average+' ';
+    }
 }
 
 function getMax(event){// Function to get the maximum temperature
     event.preventDefault();
     result.style.visibility="visible";
+    if (weather === undefined || weather.length == 0){
+        console.log(result.style.visibility);
+        result.innerHTML="No data found. Please enter records";
+    }
+    else{
     var weatherCopy=weather;
     weatherCopy=bubbleSort(weatherCopy);
     console.log(weatherCopy);
     var size=weatherCopy.length;
     var max=weatherCopy[size-1].temperature;
-    document.getElementById("printResults").innerHTML='The maximum temperature is '+max+' ';
+    result.innerHTML='The maximum temperature is '+max+' ';
+    }
 }
 
 function getMin(event){// Function to get the minimum temperature
     event.preventDefault();
     result.style.visibility="visible";
+    if (weather === undefined || weather.length == 0){
+        console.log(result.style.visibility);
+        result.innerHTML="No data found. Please enter records";
+    }
+    else{
     var weatherCopy=weather;
     weatherCopy=bubbleSort(weatherCopy);
     console.log(weatherCopy);
     var min=weather[0].temperature;
-    document.getElementById("printResults").innerHTML='The minimum temperature is '+min+' ';
+    result.innerHTML='The minimum temperature is '+min+' ';
+    }
 }
 
 function bubbleSort(weatherCopy,sortBy="temperature"){
@@ -165,18 +183,23 @@ function bubbleSort(weatherCopy,sortBy="temperature"){
 
 function createChart(){
     var myChart=document.getElementById("myChart").getContext("2d");
-    var months =["January", "February", "March", "April", "May", "June","July", "August", "September", "October", "November", "December"];
+    var months =["Jan-", "Feb-", "Mar-", "Apr-", "May-", "Jun-","Jul-", "Aug-", "Sep-", "Oct-", "Nov-", "Dec-"];
     var tempArr=weather.map(a=>a.temperature);// Store the temperatures in the new array
     var dateArr=weather.map(a=>a.date);
     var getMonths=dateArr.map(a=>a.substring(5,7));
     getMonths=getMonths.map(a=>parseInt(a));
     getMonths=getMonths.map(a=>months[a-1]);
+    getYears=dateArr.map(a=>a.substring(0,4));
+    var displayDates=[];
+    for(var i=0;i<getMonths.length;i++){
+        displayDates[i]=getMonths[i].concat(getYears[i]);
+    }
     new Chart(myChart,{
         type: 'line',
         data:{
-            labels: getMonths,
+            labels: displayDates,
             datasets:[{
-                label: 'Weather Statistics for year 2020',
+                label: 'Weather Statistics',
                 backgroundColor: 'pink',
                 borderColor: 'red',
                 data:tempArr
